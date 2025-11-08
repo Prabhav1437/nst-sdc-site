@@ -18,7 +18,7 @@ const socials = [
   {
     label: 'LinkedIn',
     icon: Linkedin,
-    href: 'https://linkedin.com/company/devclub',
+    href: 'https://www.linkedin.com/company/nst-sdc/',
   },
 ]
 
