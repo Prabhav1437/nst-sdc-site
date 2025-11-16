@@ -20,7 +20,7 @@ export function HeroSection() {
   const toggleTheme = () => {
     const newTheme = !isDark
     setIsDark(newTheme)
-    
+
     if (newTheme) {
       document.documentElement.classList.add('dark')
       localStorage.setItem('theme', 'dark')
@@ -36,28 +36,28 @@ export function HeroSection() {
 
     const handleMouseMove = (e: MouseEvent) => {
       const letters = title.querySelectorAll('.char')
-      
+
       letters.forEach((letter) => {
         const rect = letter.getBoundingClientRect()
         const letterCenterX = rect.left + rect.width / 2
         const letterCenterY = rect.top + rect.height / 2
-        
+
         const deltaX = e.clientX - letterCenterX
         const deltaY = e.clientY - letterCenterY
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
-        
+
         const maxDistance = 200
         const strength = Math.max(0, 1 - distance / maxDistance)
-        
+
         if (strength > 0) {
           const moveX = (deltaX / distance) * strength * 30
           const moveY = (deltaY / distance) * strength * 30
           const scale = 1 + strength * 0.3
           const skew = strength * 10
-          
-          ;(letter as HTMLElement).style.transform = `translate(${moveX}px, ${moveY}px) scale(${scale}) skew(${skew}deg, ${skew}deg)`
+
+            ; (letter as HTMLElement).style.transform = `translate(${moveX}px, ${moveY}px) scale(${scale}) skew(${skew}deg, ${skew}deg)`
         } else {
-          ;(letter as HTMLElement).style.transform = 'translate(0, 0) scale(1) skew(0deg, 0deg)'
+          ; (letter as HTMLElement).style.transform = 'translate(0, 0) scale(1) skew(0deg, 0deg)'
         }
       })
     }
@@ -65,7 +65,7 @@ export function HeroSection() {
     const handleMouseLeave = () => {
       const letters = title.querySelectorAll('.char')
       letters.forEach((letter) => {
-        ;(letter as HTMLElement).style.transform = 'translate(0, 0) scale(1) skew(0deg, 0deg)'
+        ; (letter as HTMLElement).style.transform = 'translate(0, 0) scale(1) skew(0deg, 0deg)'
       })
     }
 
@@ -89,7 +89,7 @@ export function HeroSection() {
   return (
     <section id="home" className={`hero-creative ${isDark ? 'dark-mood' : 'light-mood'}`}>
       <BackgroundAnimation />
-      <motion.header 
+      <motion.header
         className="hero-header"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -102,7 +102,7 @@ export function HeroSection() {
       </motion.header>
 
       <div className="hero-main">
-        <motion.div 
+        <motion.div
           className="metric metric-1"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -111,7 +111,7 @@ export function HeroSection() {
           INNOVATE
         </motion.div>
 
-        <motion.h1 
+        <motion.h1
           ref={titleRef}
           className="main-title"
           initial={{ opacity: 0, y: 50 }}
@@ -122,13 +122,13 @@ export function HeroSection() {
           <span className="title-line title-highlight">{splitText("NST Student Dev Club")}</span>
           {/* <span className="title-line">{splitText('Pune')}</span> */}
         </motion.h1>
-        <motion.div 
+        <motion.div
           className="hero-tagline"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 0.8 }}
         >
-         - Dream It - Dev It
+          - Dream It - Dev It
         </motion.div>
       </div>
     </section>

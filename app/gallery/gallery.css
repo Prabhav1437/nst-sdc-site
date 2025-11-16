@@ -1,16 +1,6 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: "Poppins", sans-serif;
-    background: #0A0F2D;
-    color: #fff;
-}
 .gallery-section {
     padding: 70px 20px;
+    font-family: var(--font-poppins, "Poppins", sans-serif);
 }
 
 .container {
@@ -148,6 +138,17 @@ body {
     border: none;
     cursor: pointer;
     color: white;
+    font-size: 2rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+.close-btn:hover {
+    transform: scale(1.1);
 }
 @keyframes fade {
     from { opacity: 0; }
@@ -168,3 +169,4 @@ body {
     opacity: 1;
     transform: translateY(0);
 }
+

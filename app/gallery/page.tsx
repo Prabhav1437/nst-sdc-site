@@ -1,50 +1,172 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { motion } from 'motion/react'
+import { useState, useEffect, useRef } from 'react'
 import clsx from 'clsx'
-import { ThemeToggleButton } from '@/components/theme-toggle-button'
+import './gallery.css'
+
+// Gallery data from the HTML file
+const galleryData = [
+  {
+    src: "https://images.unsplash.com/photo-1565687981296-535f09db714e?auto=format&fit=crop&w=1080&q=80",
+    alt: "Hackathon 2024",
+    caption: "Hackathon 2024"
+  },
+  {
+    src: "https://images.unsplash.com/photo-1558301204-e3226482a77b?auto=format&fit=crop&w=1080&q=80",
+    alt: "React Workshop",
+    caption: "React Workshop"
+  },
+  {
+    src: "https://images.unsplash.com/photo-1560439514-0fc9d2cd5e1b?auto=format&fit=crop&w=1080&q=80",
+    alt: "Tech Conference 2024",
+    caption: "Tech Conference 2024"
+  },
+  {
+    src: "https://images.unsplash.com/photo-1693386556810-43d9451bdda5?auto=format&fit=crop&w=1080&q=80",
+    alt: "Team Collaboration",
+    caption: "Team Collaboration"
+  },
+  {
+    src: "https://images.unsplash.com/photo-1603985585179-3d71c35a537c?auto=format&fit=crop&w=1080&q=80",
+    alt: "Coding Session",
+    caption: "Coding Session"
+  },
+  {
+    src: "https://images.unsplash.com/photo-1723987135977-ae935608939e?auto=format&fit=crop&w=1080&q=80",
+    alt: "Code Competition",
+    caption: "Code Competition"
+  }
+];
 
 export default function GalleryPage() {
-  const [isDark, setIsDark] = useState(false)
+  const [lightboxActive, setLightboxActive] = useState(false);
+  const [currentImage, setCurrentImage] = useState({ src: '', caption: '' });
+
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    const checkTheme = () => {
-      setIsDark(document.documentElement.classList.contains('dark'))
-    }
-    checkTheme()
-    
-    const observer = new MutationObserver(checkTheme)
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    
-    return () => observer.disconnect()
-  }, [])
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("show");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.2
+    });
+
+    // Observe all gallery items
+    itemRefs.current.forEach(item => {
+      if (item) {
+        item.classList.add("fade-in");
+        observer.observe(item);
+      }
+    });
+
+    // Cleanup observer on component unmount
+    return () => {
+      itemRefs.current.forEach(item => {
+        if (item) {
+          observer.unobserve(item);
+        }
+      });
+    };
+  }, []);
+
+  // Keyboard event listener for Escape key (converted from gallery.js)
+  useEffect(() => {
+    if (!lightboxActive) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        closeLightbox();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [lightboxActive]);
+
+  const openLightbox = (item: { src: string, caption: string }) => {
+    setCurrentImage(item);
+    setLightboxActive(true);
+  };
+
+  const closeLightbox = () => {
+    setLightboxActive(false);
+  };
 
   return (
-    <main id="gallery" className="relative min-h-screen py-20 px-4 md:px-8 lg:px-16">
-      <ThemeToggleButton />
-      
-      <div className="max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <h1 className={clsx(
-            "text-5xl md:text-7xl font-bold mb-6",
-            isDark ? "text-[#ffeb3b]" : "text-black"
-          )}>
-            Gallery
+    <section className="gallery-section">
+      <div className="container">
+        <div className="section-header">
+          <h1 className="main-title">
+            Our Gallery – <span className="gradient-text">Web Development Club</span>
           </h1>
-          <p className={clsx(
-            "text-lg md:text-xl max-w-3xl mx-auto opacity-80",
-            isDark ? "text-[#ffeb3b]" : "text-black"
-          )}>
-            Coming Soon.
+          <p className="subtitle">
+            Snapshots from our events, workshops & hackathons.
           </p>
-        </motion.div>
+          <div className="title-decoration"></div>
+        </div>
+
+        <div className="gallery-grid" id="galleryGrid">
+          {galleryData.map((item, index) => (
+            <div
+              key={index}
+              className="gallery-item"
+              data-index={index}
+              ref={(el) => {
+                itemRefs.current[index] = el;
+              }}
+              onClick={() => openLightbox(item)}
+            >
+              <div className="gallery-card">
+                <img
+                  src={item.src}
+                  alt={item.alt}
+                  className="gallery-image"
+                />
+                <div className="overlay">
+                  <div className="overlay-content">
+                    <h3 className="caption">{item.caption}</h3>
+                    <div className="view-btn">View Image</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
-    </main>
-  )
+
+      {/* Lightbox (converted from HTML) */}
+      <div className={clsx("lightbox", { "active": lightboxActive })} id="lightbox">
+        <div className="lightbox-backdrop" onClick={closeLightbox}></div>
+        <div className="lightbox-content">
+          <button
+            className="close-btn"
+            id="closeBtn"
+            aria-label="Close"
+            onClick={closeLightbox}
+          >
+            ✖
+          </button>
+          <div className="lightbox-image-wrapper">
+            <img
+              id="lightboxImage"
+              src={currentImage.src}
+              alt={currentImage.caption}
+              className="lightbox-image"
+            />
+            <p id="lightboxCaption" className="lightbox-caption">
+              {currentImage.caption}
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }
