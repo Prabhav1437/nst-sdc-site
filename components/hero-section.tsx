@@ -3,10 +3,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'motion/react'
 import { BackgroundAnimation } from './background-animation'
+import { MatrixAnimation } from './matrix-animation'
 
 export function HeroSection() {
   const [isDark, setIsDark] = useState(false)
   const titleRef = useRef<HTMLHeadingElement | null>(null)
+  const heroRef = useRef<HTMLElement | null>(null)
+  const revealRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     // Check for saved theme preference
@@ -14,6 +17,56 @@ export function HeroSection() {
     if (savedTheme === 'dark') {
       setIsDark(true)
       document.documentElement.classList.add('dark')
+    }
+  }, [])
+
+  // Fire reveal effect
+  useEffect(() => {
+    const hero = heroRef.current
+    const reveal = revealRef.current
+
+    if (!hero || !reveal) return
+
+    let mouseX = 0
+    let mouseY = 0
+    let x = 0
+    let y = 0
+    let visible = false
+
+    const animate = () => {
+      x += (mouseX - x) * 0.2
+      y += (mouseY - y) * 0.2
+
+      reveal.style.setProperty('--x', `${x}px`)
+      reveal.style.setProperty('--y', `${y}px`)
+
+      requestAnimationFrame(animate)
+    }
+
+    animate()
+
+    const move = (e: MouseEvent) => {
+      const rect = hero.getBoundingClientRect()
+      mouseX = e.clientX - rect.left
+      mouseY = e.clientY - rect.top
+
+      if (!visible) {
+        visible = true
+        reveal.classList.add('active')
+      }
+    }
+
+    const leave = () => {
+      visible = false
+      reveal.classList.remove('active')
+    }
+
+    hero.addEventListener('mousemove', move)
+    hero.addEventListener('mouseleave', leave)
+
+    return () => {
+      hero.removeEventListener('mousemove', move)
+      hero.removeEventListener('mouseleave', leave)
     }
   }, [])
 
@@ -87,8 +140,11 @@ export function HeroSection() {
   }
 
   return (
-    <section id="home" className={`hero-creative ${isDark ? 'dark-mood' : 'light-mood'}`} style={{ scrollMarginTop: '80px' }}>
+    <section id="home" ref={heroRef} className={`hero-creative ${isDark ? 'dark-mood' : 'light-mood'}`} style={{ scrollMarginTop: '80px' }}>
       <BackgroundAnimation />
+      <div className="fire-reveal" ref={revealRef}>
+        <MatrixAnimation />
+      </div>
       <motion.header
         className="hero-header"
         initial={{ opacity: 0, y: -20 }}
@@ -97,7 +153,7 @@ export function HeroSection() {
       >
         <div className="logo">DEV CLUB</div>
         <button className="mood-toggle" onClick={toggleTheme}>
-          Load into the DARKNESS
+          {isDark ? 'Brighten my Future' : 'Load into the DARKNESS'}
         </button>
       </motion.header>
 
